@@ -1,0 +1,44 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Branch Dashboard";
+}
+
+<h2 class="mb-4">Welcome Branch Manager</h2>
+<p class="lead">You can manage your branch inventory, request items, and sell to customers.</p>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
+
+    <!-- View Inventory -->
+    <div class="col">
+        <div class="card border-primary h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">📦 View Inventory</h5>
+                <p class="card-text">Check and search your branch’s current stock.</p>
+                <a href="/myInventory/Index" class="btn btn-primary">Go to Inventory</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sell Products -->
+    <div class="col">
+        <div class="card border-success h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">🛒 Start Selling</h5>
+                <p class="card-text">Sell products directly to customers.</p>
+                <a href="/Sell/Index" class="btn btn-success">Sell Now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Stock (Future) -->
+    <div class="col">
+        <div class="card border-warning h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">📨 Request Stock</h5>
+                <p class="card-text">Ask other branches or warehouses for more stock.</p>
+                <a href="#" class="btn btn-warning disabled">Coming Soon</a>
+            </div>
+        </div>
+    </div>
+
+</div>

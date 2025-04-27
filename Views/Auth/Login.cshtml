@@ -1,0 +1,28 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Login";
+}
+
+<div class="container mt-5" style="max-width: 400px;">
+    <h2 class="text-center">Login</h2>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    @using (Html.BeginForm("Login", "Auth", FormMethod.Post))
+    {
+        <div class="form-group mb-3">
+            <label for="username">username</label>
+            <input type="text" name="username" class="form-control" placeholder="Enter username" required />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="password">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+    }
+</div>

@@ -1,0 +1,82 @@
+﻿@model DEPI_GraduationProject.Models.Sales
+
+@{
+    ViewData["Title"] = "Sale Confirmation";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h4>✅ Sale Confirmation</h4>
+        </div>
+        <div class="card-body">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5>Sale Details</h5>
+                    <p><strong>Sale ID:</strong> @Model.Id</p>
+                    <p><strong>Date:</strong> @Model.SaleDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Location:</strong> @Model.Location.Name</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Customer Information</h5>
+                    <p><strong>Name:</strong> @Model.Clients.Name</p>
+                    <p><strong>Phone:</strong> @Model.Clients.Phone</p>
+                    <p><strong>Car Number:</strong> @Model.Clients.CarNumber</p>
+                    @if (!string.IsNullOrEmpty(Model.Clients.CarModel))
+                    {
+                        <p><strong>Car Model:</strong> @Model.Clients.CarModel</p>
+                    }
+                </div>
+            </div>
+
+            <h5>Items</h5>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product Code</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Adhesive Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SaleDetails)
+                    {
+                        <tr>
+                            <td>@item.Product.Code</td>
+                            <td>@item.Product.name</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @{
+                                    var adhesiveUsage = Model.AdhesiveUsages
+                                    .FirstOrDefault(au => au.ProductId == item.ProductId);
+
+                                    if (adhesiveUsage != null)
+                                    {
+                                        @adhesiveUsage.Amount <text>ml</text>
+                                    }
+                                    else
+                                    {
+                                        <text>N/A</text>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="mt-4">
+                <a asp-action="Index" class="btn btn-primary">New Sale</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
