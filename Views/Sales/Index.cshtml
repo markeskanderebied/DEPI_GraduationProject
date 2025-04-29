@@ -1,0 +1,186 @@
+﻿
+
+
+                        @model DEPI_GraduationProject.ViewModels.PosSaleViewModel
+
+@{
+    ViewData["Title"] = "POS Sales";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<style>
+    .ui-autocomplete {
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 9999 !important;
+    }
+
+    .ui-menu-item {
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+        .ui-menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+    .ui-state-active, .ui-widget-content .ui-state-active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            POS Sale Entry
+        </div>
+        <div class="card-body">
+            <form asp-action="SubmitSale" method="post" id="posSaleForm">
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="ClientName" class="form-label">Client Name</label>
+                        <input asp-for="ClientName" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="ClientNumber" class="form-label">Client Number</label>
+                        <input asp-for="ClientNumber" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CarNumber" class="form-label">Car Number</label>
+                        <input asp-for="CarNumber" class="form-control" />
+                    </div>
+                </div>
+
+                <table class="table table-bordered align-middle" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Product Code</th>
+                            <th>Product Name</th>
+                           <!-- <th>Adhesive Amount (ml)</th>-->
+                            <th style="width:60px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- JS will fill rows -->
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-outline-primary mb-3" id="addProductRow">Add Product</button>
+                <button type="submit" class="btn btn-success float-end">Submit Sale</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+        let rowIdx = 0;
+        function getProductRow(idx) {
+            return `<tr>
+                <td>
+                    <div class="dropdown-search-container position-relative">
+                        <input name="Products[${idx}].ProductCode" class="form-control product-code" autocomplete="off" placeholder="Start typing product code..." />
+                    </div>
+                </td>
+                <td>
+                    <input name="Products[${idx}].ProductName" class="form-control" readonly />
+                </td>
+               <!-- <td>
+                    <input name="Products[${idx}].AdhesiveAmount" class="form-control" type="number" step="0.01" min="0" />
+                </td>-->
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                </td>
+            </tr>`;
+        }
+
+        // Enhanced autocomplete setup
+        function attachAutocomplete(input) {
+            $(input).autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Products/SuggestProductCodes',
+                        data: { term: request.term },
+                        dataType: 'json',
+                        success: function (data) {
+                            // Limit to 10 results for better UX
+                            response(data.slice(0, 10));
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    $(this).val(ui.item.value);
+
+                    // Fetch product name when code is selected
+                    var $row = $(this).closest('tr');
+                    fetchProductName(ui.item.value, $row);
+
+                    return false;
+                }
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                // Custom rendering for dropdown items
+                return $("<li>")
+                    .append("<div>" + item.value + "</div>")
+                    .appendTo(ul);
+            };
+        }
+
+        // Function to fetch product name
+        function fetchProductName(code, $row) {
+            if (!code) {
+                $row.find('input[name*="ProductName"]').val('');
+                return;
+            }
+
+            $.get('/Products/GetProductNameByCode', { code: code }, function (data) {
+                if (data && data.productName) {
+                    $row.find('input[name*="ProductName"]').val(data.productName);
+                } else {
+                    $row.find('input[name*="ProductName"]').val('Product not found');
+                }
+            }).fail(function () {
+                $row.find('input[name*="ProductName"]').val('Error loading product');
+            });
+        }
+
+        // Add first row on load
+        $(document).ready(function () {
+            $("#addProductRow").trigger("click");
+        });
+
+        $("#addProductRow").click(function () {
+            let newRow = $(getProductRow(rowIdx++));
+            $("#productsTable tbody").append(newRow);
+            attachAutocomplete(newRow.find('.product-code'));
+        });
+
+        // Remove row handler
+        $("#productsTable").on('click', '.remove-row', function () {
+            $(this).closest('tr').remove();
+        });
+
+        // Ensure all product code inputs have autocomplete
+        $("#productsTable").on('focus', '.product-code', function () {
+            if (!$(this).data('ui-autocomplete')) {
+                attachAutocomplete(this);
+            }
+        });
+
+        // Handle manual input without selection
+        $("#productsTable").on('change', '.product-code', function() {
+            var $row = $(this).closest('tr');
+            var code = $(this).val();
+            fetchProductName(code, $row);
+        });
+    </script>
+}
