@@ -25,8 +25,6 @@ namespace DEPI_GraduationProject.ViewModels
 
 		public string ProductName { get; set; }
 
-		[Required]
-		[Range(0.01, double.MaxValue, ErrorMessage = "Please enter a valid adhesive amount")]
-		public decimal AdhesiveAmount { get; set; }
+
 	}
 }

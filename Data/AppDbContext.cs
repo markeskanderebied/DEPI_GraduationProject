@@ -9,9 +9,9 @@ public class AppDbContext : DbContext
 	public DbSet<Location> Locations { get; set; }
 	public DbSet<Product> Products { get; set; }
 	public DbSet<Inventory> Inventory { get; set; }
-	public DbSet<glassfixationCategory> glassfixationCategory { get; set; }
+	public DbSet<GlassFixationCategory> glassfixationCategory { get; set; }
 	public DbSet<Sales> Sales { get; set; }
-	public DbSet<SalesDetails> SalesDetails { get; set; }
+	public DbSet<SaleDetails> SaleDetails { get; set; }
 	public DbSet<Clients> Clients { get; set; }
 	//public DbSet<AdhesiveUsage> AdhesiveUsage { get; set; }
 	public object Product { get; internal set; }
@@ -32,38 +32,45 @@ public class AppDbContext : DbContext
 			.HasForeignKey(i => i.Location_id)
 			.HasConstraintName("FK_Inventory_Location");
 
+		//modelBuilder.Entity<Product>()
+		//   .HasOne(p => p.Category)
+		//   .WithMany()
+		//   .HasForeignKey(p => p.CategoryId)
+		//   .HasConstraintName("FK_Product_Category");
+
 		modelBuilder.Entity<Product>()
-		   .HasOne(p => p.Category)
-		   .WithMany()
-		   .HasForeignKey(p => p.CategoryId)
-		   .HasConstraintName("FK_Product_Category");
+	.HasOne(p => p.Category)  // Product has one Category
+	.WithMany(c => c.Products)  // Category has many Products
+	.HasForeignKey(p => p.CategoryId)  // Foreign key is CategoryId in Product
+	.HasConstraintName("FK_Product_Category");
+
 
 		// Sales - Clients relationship
 		modelBuilder.Entity<Sales>()
 			.HasOne(s => s.Clients)
 			.WithMany(c => c.Sales)
-			.HasForeignKey(s => s.ClientId)
+			.HasForeignKey(s => s.client_id)
 			.HasConstraintName("FK_Sale_Client");
 
 		// Sales - Location relationship
 		modelBuilder.Entity<Sales>()
 			.HasOne(s => s.Location)
 			.WithMany()
-			.HasForeignKey(s => s.LocationId)
+			.HasForeignKey(s => s.location_id)
 			.HasConstraintName("FK_Sale_Location");
 
 		// SalesDetails - Sales relationship
-		modelBuilder.Entity<SalesDetails>()
+		modelBuilder.Entity<SaleDetails>()
 			.HasOne(sd => sd.Sales)
 			.WithMany(s => s.SaleDetails)
-			.HasForeignKey(sd => sd.SaleId)
+			.HasForeignKey(sd => sd.sale_id)
 			.HasConstraintName("FK_SaleDetail_Sale");
 
 		// SalesDetails - Product relationship
-		modelBuilder.Entity<SalesDetails>()
+		modelBuilder.Entity<SaleDetails>()
 			.HasOne(sd => sd.Product)
 			.WithMany()
-			.HasForeignKey(sd => sd.ProductId)
+			.HasForeignKey(sd => sd.product_id)
 			.HasConstraintName("FK_SaleDetail_Product");
 		/*
 		// AdhesiveUsage - Sales relationship

@@ -1,0 +1,52 @@
+﻿@model DEPI_GraduationProject.Models.Product
+
+<h1>Edit Product</h1>
+
+<div class="row">
+    <div class="col-4">
+        <form asp-action="Edit">
+            <input type="hidden" name="Id" value="@Model.Id" /> <!-- Corrected field for Product Code -->
+
+            <div>
+                <label asp-for="Code"></label> <!-- Updated to 'name' -->
+                <input asp-for="Code" class="form-control" /> <!-- Updated to 'name' -->
+                <span asp-validation-for="Code" class="text-danger"></span> <!-- Updated to 'name' -->
+            </div>
+
+            <div>
+                <label asp-for="name"></label> <!-- Updated to 'name' -->
+                <input asp-for="name" class="form-control" /> <!-- Updated to 'name' -->
+                <span asp-validation-for="name" class="text-danger"></span> <!-- Updated to 'name' -->
+            </div>
+
+            <div>
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="color"></label> <!-- Updated to 'color' -->
+                <input asp-for="color" class="form-control" /> <!-- Updated to 'color' -->
+                <span asp-validation-for="color" class="text-danger"></span> <!-- Updated to 'color' -->
+            </div>
+
+            <div>
+                <label asp-for="type"></label> <!-- Updated to 'type' -->
+                <input asp-for="type" class="form-control" /> <!-- Updated to 'type' -->
+                <span asp-validation-for="type" class="text-danger"></span> <!-- Updated to 'type' -->
+            </div>
+
+             <div>
+                <label asp-for="CategoryId"></label>
+                <select asp-for="CategoryId" asp-items="(IEnumerable<SelectListItem>)ViewBag.CategoryID" class="form-control">
+                </select>
+
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div> 
+
+            <input type="submit" value="Save Changes" class="btn btn-dark" />
+            <a asp-action="Index">Back to Product Home</a>
+        </form>
+    </div>
+</div>

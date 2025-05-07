@@ -1,11 +1,11 @@
 ﻿namespace DEPI_GraduationProject.Models
 {
-	public class SalesDetails
+	public class SaleDetails
 
 	{
 		public int Id { get; set; }
-		public int SaleId { get; set; }
-		public int ProductId { get; set; }
+		public int sale_id { get; set; }
+		public int product_id { get; set; }
 		public int Quantity { get; set; }
 
 		// Navigation property

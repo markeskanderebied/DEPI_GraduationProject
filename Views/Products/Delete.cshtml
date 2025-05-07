@@ -1,0 +1,10 @@
+﻿@model DEPI_GraduationProject.Models.Product
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete the product <strong>@Model.name</strong>?</h3>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    <input type="submit" value="Delete Now" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-secondary">Back to Product Home</a>
+</form>

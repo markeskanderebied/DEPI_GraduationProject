@@ -10,7 +10,7 @@
 		public string Code { get; set; }
 
 		public int CategoryId { get; set; }  // Foreign key to GlassFixationCategory
-		public glassfixationCategory Category { get; set; }  // Navigation property
+		public GlassFixationCategory? Category { get; set; }  // Navigation property
 
 
 

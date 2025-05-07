@@ -4,14 +4,14 @@
 
 	{
 		public int Id { get; set; }
-		public int LocationId { get; set; }
-		public int ClientId { get; set; }
-		public DateTime SaleDate { get; set; }
+		public int location_id { get; set; }
+		public int client_id { get; set; }
+		public DateTime sale_date { get; set; }
 		
 		// Navigation properties
 		public Clients Clients { get; set; }
-		public ICollection<SalesDetails> SaleDetails { get; set; }
-		public ICollection<AdhesiveUsage> AdhesiveUsages { get; set; }
+		public ICollection<SaleDetails> SaleDetails { get; set; }
+		
 		public Location Location { get; set; }
 	}
 }

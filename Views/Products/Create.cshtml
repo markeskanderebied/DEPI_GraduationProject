@@ -1,0 +1,56 @@
+﻿@model DEPI_GraduationProject.Models.Product
+
+<h1>Add New Product</h1>
+
+<div class="col-6">
+    <form asp-action="Create">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div>
+            <label asp-for="name"></label>
+            <input asp-for="name" class="form-control" />
+            <span asp-validation-for="name" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Price"></label>
+            <input asp-for="Price" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="color"></label>
+            <input asp-for="color" class="form-control" />
+            <span asp-validation-for="color" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="type"></label>
+            <input asp-for="type" class="form-control" />
+            <span asp-validation-for="type" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Code"></label>
+            <input asp-for="Code" class="form-control" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="CategoryId"></label>
+            <select asp-for="CategoryId" asp-items="ViewBag.CategoryId" class="form-select">
+                <option >-- Select Category --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+
+        <input type="submit" value="Save Product" class="btn btn-dark" />
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

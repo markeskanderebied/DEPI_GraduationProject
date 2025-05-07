@@ -29,7 +29,43 @@
         border-color: #0d6efd;
         color: white;
     }
-</style>
+</style
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ViewBag.SuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+@if (ViewData.ModelState.ContainsKey("Products"))
+{
+    <div class="alert alert-danger">
+        @Html.ValidationMessage("Products")
+    </div>
+}
+@if (ViewData.ModelState.ContainsKey("ClientNumber"))
+{
+    <div class="alert alert-danger">
+        @Html.ValidationMessage("ClientNumber")
+    </div>
+}
+@if (ViewData.ModelState.ContainsKey("savingClient"))
+{
+    <div class="alert alert-danger">
+        @Html.ValidationMessage("savingClient")
+    </div>
+}
+@if (ViewData.ModelState.ContainsKey("productNotFound"))
+{
+    <div class="alert alert-danger">
+        @Html.ValidationMessage("productNotFound")
+    </div>
+}
+
+
 
 <div class="container mt-4">
     <div class="card">

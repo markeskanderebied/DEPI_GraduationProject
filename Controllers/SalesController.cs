@@ -2,6 +2,7 @@
 using DEPI_GraduationProject.Models;    // Namespace for your models
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.CodeAnalysis.Scripting.Hosting;
 
 namespace DEPI_GraduationProject.Controllers
 {
@@ -45,10 +46,10 @@ namespace DEPI_GraduationProject.Controllers
 			// --- Determine LocationId ---
 
 
-			//int locationId = HttpContext.Session.GetInt32("EmployeeLocationId")
-			// ?? throw new Exception("Employee Location not found in session.");
+			int locationId = HttpContext.Session.GetInt32("EmployeeLocationId")
+			 ?? throw new Exception("Employee Location not found in session.");
 
-			int locationId = 0;
+			//int locationId = 0;
 
 			// --- Client Handling Logic ---
 			// Assuming model.ClientNumber maps to Clients.Phone
@@ -68,7 +69,7 @@ namespace DEPI_GraduationProject.Controllers
 				{
 					Name = model.ClientName,
 					Phone = model.ClientNumber, // Store number in Phone field
-					CarNumber = model.CarNumber
+					car_number = model.CarNumber
 				};
 				_context.Clients.Add(client);
 				try
@@ -79,7 +80,7 @@ namespace DEPI_GraduationProject.Controllers
 				catch (DbUpdateException dbEx)
 				{
 					// Log dbEx.InnerException
-					ModelState.AddModelError("", "Failed to save new client information. " + dbEx.InnerException?.Message ?? dbEx.Message);
+					ModelState.AddModelError("savingClient", "Failed to save new client information. " + dbEx.InnerException?.Message ?? dbEx.Message);
 					return View("PosSale", model);
 				}
 				catch (Exception ex) // Catch other potential errors during client save
@@ -92,7 +93,7 @@ namespace DEPI_GraduationProject.Controllers
 			// We now have a valid client.Id
 			int clientId = client.Id;
 
-
+			
 			// --- Data Processing Logic ---
 			using (var transaction = await _context.Database.BeginTransactionAsync())
 			{
@@ -101,10 +102,10 @@ namespace DEPI_GraduationProject.Controllers
 					// 1. Create the main Sale record
 					var sale = new Sales // Use 'Sales' model name
 					{
-						LocationId = locationId,
-						ClientId = clientId,
-						SaleDate = DateTime.UtcNow,
-						SaleDetails = new List<SalesDetails>(), // Initialize collections
+						location_id = locationId,
+						client_id = clientId,
+						sale_date = DateTime.UtcNow,
+						SaleDetails = new List<SaleDetails>(), // Initialize collections
 						
 					};
 					_context.Sales.Add(sale);
@@ -126,8 +127,8 @@ namespace DEPI_GraduationProject.Controllers
 
 						if (product == null)
 						{
-							ModelState.AddModelError("", $"Product with code '{item.ProductCode}' not found.");
-							await transaction.RollbackAsync();
+							ModelState.AddModelError("productNotFound", $"Product with code '{item.ProductCode}' not found.");
+							await	 transaction.RollbackAsync();
 							return View("PosSale", model);
 						}
 
@@ -137,60 +138,39 @@ namespace DEPI_GraduationProject.Controllers
 						var inventoryItem = await _context.Inventory
 													.FirstOrDefaultAsync(inv => inv.Product_id == product.Id && inv.Location_id == locationId);
 
-						// --- !!! CRITICAL LOGIC ISSUE !!! ---
-						// The 'Inventory' model tracks 'Quantity' (item count).
-						// The 'AdhesiveUsage' model tracks 'Amount' (volume, ml).
-						// We CANNOT directly compare inventoryItem.Quantity (e.g., number of tubes)
-						// with item.AdhesiveAmount (e.g., 50 ml) without knowing how many ml
-						// are in one quantity unit of the adhesive product.
-						//
-						// TODO: Requires clarification or model change:
-						// 1. Does Product model need an 'MlPerUnit' property for adhesives?
-						// 2. Should Inventory track volume instead of quantity for liquids?
-						//
-						// For now, we can only check if *any* inventory record exists,
-						// but cannot perform a meaningful stock *level* check for adhesive volume.
-						// We will proceed WITHOUT blocking the sale based on this check.
+						if (inventoryItem != null)
+						{
+							inventoryItem.Quantity -= 1;
 
+							if (inventoryItem.Quantity < 0)
+							{
+								ModelState.AddModelError("", $"Not enough inventory for product {product.Code}.");
+								await transaction.RollbackAsync();
+								return View("PosSale", model);
+							}
+						}
 						if (inventoryItem == null)
 						{
-							// Log this maybe? Or decide if having an inventory record is mandatory
-							// ModelState.AddModelError("", $"Inventory record not found for product {product.Code} at location {locationId}.");
-							// await transaction.RollbackAsync();
-							// return View("PosSale", model);
-							// For now, let's allow proceeding even without inventory record, but this should be reviewed.
+							ModelState.AddModelError("", $"No inventory found for product {product.Code} at this location.");
+							await transaction.RollbackAsync();
+							return View("PosSale", model);
 						}
-						else
-						{
-							// We have an inventoryItem.Quantity, but cannot compare it meaningfully to item.AdhesiveAmount (ml)
-							// Example: if (inventoryItem.Quantity < ???) { Error }
-							// Cannot implement this check correctly with current models.
-						}
+
+
+
+
 
 
 						// Create the Sale Detail record
-						var saleDetail = new SalesDetails // Use 'SalesDetails' model name
+						var saleDetail = new SaleDetails // Use 'SalesDetails' model name
 						{
 							// SaleId will be set by EF relationship fixup if added to sale.SaleDetails
 							// SaleId = sale.Id,
-							ProductId = product.Id,
+							product_id = product.Id,
 							Quantity = 1 // *** ASSUMPTION: Quantity is 1 per line item ***
 						};
 						sale.SaleDetails.Add(saleDetail); // Add to Sale's collection
-						/*
-						// Create Adhesive Usage record
-						if (item.AdhesiveAmount > 0)
-						{
-							var adhesiveUsage = new AdhesiveUsage
-							{
-								// SaleId will be set by EF relationship fixup
-								// SaleId = sale.Id,
-								ProductId = product.Id, // *** ASSUMPTION: Linking usage to the product in the row ***
-								Amount = (double)item.AdhesiveAmount, // Cast Decimal to Double for model
-																	  // UsageDate could be set here or rely on SaleDate relation
-							};
-							sale.AdhesiveUsages.Add(adhesiveUsage); // Add to Sale's collection
-						}*/
+						
 					} // End of product loop
 
 					// Check if any valid items were actually added to the sale
