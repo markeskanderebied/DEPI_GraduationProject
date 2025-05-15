@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DEPI_GraduationProject.Models;
-using DEPI_GraduationProject.ViewModels;
 
 public class myInventoryController : Controller
 {

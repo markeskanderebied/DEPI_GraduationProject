@@ -10,33 +10,66 @@
 
     <!-- View Inventory -->
     <div class="col">
-        <div class="card border-primary h-100 shadow-sm">
+        <div class="card h-100 shadow-sm" style="border: 2px solid #6C5CE7;">
             <div class="card-body text-center">
-                <h5 class="card-title">📦 View Inventory</h5>
+                <h5 class="card-title" style="color: #6C5CE7;">📦 View Inventory</h5>
                 <p class="card-text">Check and search your branch’s current stock.</p>
-                <a href="/myInventory/Index" class="btn btn-primary">Go to Inventory</a>
+                <a href="/myInventory/Index" class="btn" style="background-color: #6C5CE7; color: white;">Go to Inventory</a>
             </div>
         </div>
     </div>
 
     <!-- Sell Products -->
     <div class="col">
-        <div class="card border-success h-100 shadow-sm">
+        <div class="card h-100 shadow-sm" style="border: 2px solid #00B894;">
             <div class="card-body text-center">
-                <h5 class="card-title">🛒 Start Selling</h5>
+                <h5 class="card-title" style="color: #00B894;">🛒 Start Selling</h5>
                 <p class="card-text">Sell products directly to customers.</p>
-                <a href="/Sales/PosSale" class="btn btn-success">Sell Now</a>
+                <a href="/Sales/PosSale" class="btn" style="background-color: #00B894; color: white;">Sell Now</a>
             </div>
         </div>
     </div>
 
-    <!-- Request Stock (Future) -->
+    <!-- Request Stock -->
     <div class="col">
-        <div class="card border-warning h-100 shadow-sm">
+        <div class="card h-100 shadow-sm" style="border: 2px solid #FAB1A0;">
             <div class="card-body text-center">
-                <h5 class="card-title">📨 Request Stock</h5>
+                <h5 class="card-title" style="color: #FAB1A0;">📨 Request Stock</h5>
                 <p class="card-text">Ask other branches or warehouses for more stock.</p>
-                <a href="#" class="btn btn-warning disabled">Coming Soon</a>
+                <a href="/StockRequest/Create" class="btn" style="background-color: #FAB1A0; color: white;">Request Now</a>
+            </div>
+        </div>
+    </div>
+
+        <!-- View Other Branches Inventory -->
+    <div class="col">
+        <div class="card h-100 shadow-sm" style="border: 2px solid #74B9FF;">
+            <div class="card-body text-center">
+                <h5 class="card-title" style="color: #74B9FF;">🔍 View Other Branches</h5>
+                <p class="card-text">Check the inventory in other locations.</p>
+                <a href="/ViewOtherInventory/Index" class="btn" style="background-color: #74B9FF; color: white;">Browse Branches</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Sales History -->
+    <div class="col">
+        <div class="card h-100 shadow-sm" style="border: 2px solid #A29BFE;">
+            <div class="card-body text-center">
+                <h5 class="card-title" style="color: #A29BFE;">📊 Sales History</h5>
+                <p class="card-text">Browse all previous sales made at your branch.</p>
+                <a href="/SalesHistory/Index" class="btn" style="background-color: #A29BFE; color: white;">View History</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve Requests -->
+    <div class="col">
+        <div class="card h-100 shadow-sm" style="border: 2px solid #55EFC4;">
+            <div class="card-body text-center">
+                <h5 class="card-title" style="color: #55EFC4;">✅ Approve Requests</h5>
+                <p class="card-text">Review and approve or decline pending stock requests.</p>
+                <a href="/StockApproval/Index" class="btn" style="background-color: #55EFC4; color: white;">Manage Requests</a>
             </div>
         </div>
     </div>

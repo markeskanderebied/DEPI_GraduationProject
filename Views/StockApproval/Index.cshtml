@@ -1,0 +1,59 @@
+﻿@model IEnumerable<DEPI_GraduationProject.ViewModels.StockRequestViewModel>
+
+<h2 class="mt-4 mb-4">Stock Requests</h2>
+
+<div class="input-group mb-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search by product code, location, or status">
+    <button id="searchBtn" class="btn btn-primary" type="button">Search</button>
+    <button id="clearBtn" class="btn btn-secondary" type="button">Clear</button>
+</div>
+
+<div id="stockRequestList">
+    <partial name="_StockRequestList" model="Model" />
+</div>
+
+@section Scripts {
+    <script>
+        // Handle approve/decline form submissions
+        $('form').submit(function (event) {
+            event.preventDefault();
+            var form = $(this);
+            $.post(form.attr('action'), form.serialize(), function (data) {
+                $('#stockRequestList').html(data);
+            });
+        });
+
+        // Handle search button click
+        $('#searchBtn').click(function () {
+            var searchTerm = $('#searchInput').val().toLowerCase();
+            $.ajax({
+                url: '@Url.Action("Search", "StockApproval")',
+                type: 'GET',
+                data: { searchTerm: searchTerm },
+                success: function (data) {
+                    $('#stockRequestList').html(data);
+                },
+                error: function () {
+                    alert('Error performing search. Please try again.');
+                }
+            });
+        });
+
+        // Handle clear button click
+        $('#clearBtn').click(function () {
+            $('#searchInput').val(''); // Clear the input field
+            $.ajax({
+                url: '@Url.Action("Index", "StockApproval")',
+                type: 'GET',
+                success: function (data) {
+                    console.log('Clear response:', data); // Log the response
+                    $('#stockRequestList').html(data);
+                },
+                error: function (xhr, status, error) {
+                    console.log('AJAX error:', status, error); // Log any errors
+                    alert('Error resetting search. Please try again.');
+                }
+            });
+        });
+    </script>
+}

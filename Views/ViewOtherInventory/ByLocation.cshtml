@@ -1,88 +1,72 @@
-﻿@model List<DEPI_GraduationProject.ViewModels.myInventoryViewModel>
+﻿@model IEnumerable<DEPI_GraduationProject.Models.Inventory>
 
 @{
-    ViewData["Title"] = "My Inventory";
+    ViewData["Title"] = "Other Branch Inventory";
+    var location = ViewBag.Location as DEPI_GraduationProject.Models.Location;
 }
 
-<h2 class="mb-4">My Inventory</h2>
+<h2 class="mb-4">Inventory at @location?.Name (@location?.Type)</h2>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" />
 <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.4.1/css/rowGroup.dataTables.min.css" />
 
-<table id="inventoryTable" class="display nowrap" style="width:100%">
+<table id="otherInventoryTable" class="display nowrap" style="width:100%">
     <thead>
-        <!-- First header row with column names -->
         <tr>
+            <th>Product Name</th>
             <th>Code</th>
-            <th>Product</th>
-            <th>Type</th>
             <th>Color</th>
+            <th>Type</th>
             <th>Quantity</th>
             <th>Shelf</th>
-            <th>Price</th>
-			<th>Total Price</th>
         </tr>
-        <!-- Second row for filters -->
-       <tr>
+        <tr>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
-            <th><select><option value="">All</option></select></th>
-            <th><select><option value="">All</option></select></th>
-
-
-
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.ProductCode</td>
-                <td>@item.ProductName</td>
-                <td>@item.ProductType</td>
-                <td>@item.ProductColor</td>
+                <td>@item.Product?.name</td>
+                <td>@item.Product?.Code</td>
+                <td>@item.Product?.color</td>
+                <td>@item.Product?.type</td>
                 <td>@item.Quantity</td>
                 <td>@item.Shelf</td>
-                <td>@item.Price</td>
-                <td> @item.TotalPrice</td>
             </tr>
         }
     </tbody>
 </table>
 
 @section Scripts {
-    <!-- jQuery & DataTables Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-    <!-- DataTables Buttons -->
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-
-    <!-- RowGroup + Responsive -->
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/rowgroup/1.4.1/js/dataTables.rowGroup.min.js"></script>
 
     <script>
         $(document).ready(function () {
-            var table = $('#inventoryTable').DataTable({
+            var table = $('#otherInventoryTable').DataTable({
                 responsive: true,
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 order: [[0, 'asc']],
-               
                 initComplete: function () {
-                    this.api().columns([0, 1, 2, 3,4,5,6]).every(function () {
+                    this.api().columns([0, 1, 2, 3, 4, 5]).every(function () {
                         var column = this;
                         var select = $('<select><option value="">All</option></select>')
                             .appendTo($(column.header()).empty())

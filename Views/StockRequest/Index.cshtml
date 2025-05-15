@@ -1,0 +1,41 @@
+﻿@model IEnumerable<DEPI_GraduationProject.ViewModels.StockRequestViewModel>
+
+<h2>Stock Requests</h2>
+
+<form method="get" class="mb-3">
+    <div class="form-row d-flex gap-2">
+        <input type="text" name="searchTerm" value="@Context.Request.Query["searchTerm"]" class="form-control" placeholder="Search by product, location, or status" />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-secondary">Clear</a>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>From Location</th>
+            <th>To Location</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var req in Model)
+        {
+            <tr>
+                <td>@req.RequestId</td>
+                <td>@req.FromLocationName</td>
+                <td>@req.ToLocationName</td>
+                <td>@req.ProductName</td>
+                <td>@req.Quantity</td>
+                <td>@req.RequestDate.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@req.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Request New Stock</a>

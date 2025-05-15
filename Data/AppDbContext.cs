@@ -13,8 +13,9 @@ public class AppDbContext : DbContext
 	public DbSet<Sales> Sales { get; set; }
 	public DbSet<SaleDetails> SaleDetails { get; set; }
 	public DbSet<Clients> Clients { get; set; }
-	//public DbSet<AdhesiveUsage> AdhesiveUsage { get; set; }
-	public object Product { get; internal set; }
+    public DbSet<StockRequest> StockRequests { get; set; }
+
+    public object Product { get; internal set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -31,12 +32,6 @@ public class AppDbContext : DbContext
 			.WithMany()
 			.HasForeignKey(i => i.Location_id)
 			.HasConstraintName("FK_Inventory_Location");
-
-		//modelBuilder.Entity<Product>()
-		//   .HasOne(p => p.Category)
-		//   .WithMany()
-		//   .HasForeignKey(p => p.CategoryId)
-		//   .HasConstraintName("FK_Product_Category");
 
 		modelBuilder.Entity<Product>()
 	.HasOne(p => p.Category)  // Product has one Category
@@ -72,21 +67,5 @@ public class AppDbContext : DbContext
 			.WithMany()
 			.HasForeignKey(sd => sd.product_id)
 			.HasConstraintName("FK_SaleDetail_Product");
-		/*
-		// AdhesiveUsage - Sales relationship
-		modelBuilder.Entity<AdhesiveUsage>()
-			.HasOne(au => au.Sales)
-			.WithMany(s => s.AdhesiveUsages)
-			.HasForeignKey(au => au.SaleId)
-			.HasConstraintName("FK_AdhesiveUsage_Sale");*/
-
-		/*
-		// AdhesiveUsage - Product relationship
-		modelBuilder.Entity<AdhesiveUsage>()
-			.HasOne(au => au.Product)
-			.WithMany()
-			.HasForeignKey(au => au.ProductId)
-			.HasConstraintName("FK_AdhesiveUsage_Product");
-		*/
 	}
 }

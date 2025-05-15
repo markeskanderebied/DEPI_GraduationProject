@@ -1,88 +1,74 @@
-﻿@model List<DEPI_GraduationProject.ViewModels.myInventoryViewModel>
+﻿@model IEnumerable<DEPI_GraduationProject.Models.Sales>
 
 @{
-    ViewData["Title"] = "My Inventory";
+    ViewData["Title"] = "Past Sales";
 }
 
-<h2 class="mb-4">My Inventory</h2>
+<h2 class="mb-4">Past Sales</h2>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" />
 <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.4.1/css/rowGroup.dataTables.min.css" />
 
-<table id="inventoryTable" class="display nowrap" style="width:100%">
+<table id="salesTable" class="display nowrap" style="width:100%">
     <thead>
-        <!-- First header row with column names -->
         <tr>
-            <th>Code</th>
+            <th>Sale ID</th>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Location</th>
             <th>Product</th>
-            <th>Type</th>
-            <th>Color</th>
             <th>Quantity</th>
-            <th>Shelf</th>
-            <th>Price</th>
-			<th>Total Price</th>
         </tr>
-        <!-- Second row for filters -->
-       <tr>
+        <tr>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
-            <th><select><option value="">All</option></select></th>
-            <th><select><option value="">All</option></select></th>
-
-
-
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var sale in Model)
         {
-            <tr>
-                <td>@item.ProductCode</td>
-                <td>@item.ProductName</td>
-                <td>@item.ProductType</td>
-                <td>@item.ProductColor</td>
-                <td>@item.Quantity</td>
-                <td>@item.Shelf</td>
-                <td>@item.Price</td>
-                <td> @item.TotalPrice</td>
-            </tr>
+            foreach (var detail in sale.SaleDetails)
+            {
+                <tr>
+                    <td>@sale.Id</td>
+                    <td>@sale.sale_date.ToString("g")</td>
+                    <td>@sale.Clients?.Name</td>
+                    <td>@sale.Location?.Name</td>
+                    <td>@detail.Product?.name</td>
+                    <td>@detail.Quantity</td>
+                </tr>
+            }
         }
     </tbody>
 </table>
 
 @section Scripts {
-    <!-- jQuery & DataTables Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-    <!-- DataTables Buttons -->
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-
-    <!-- RowGroup + Responsive -->
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/rowgroup/1.4.1/js/dataTables.rowGroup.min.js"></script>
 
     <script>
         $(document).ready(function () {
-            var table = $('#inventoryTable').DataTable({
+            var table = $('#salesTable').DataTable({
                 responsive: true,
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                order: [[0, 'asc']],
-               
+                order: [[0, 'desc']],
                 initComplete: function () {
-                    this.api().columns([0, 1, 2, 3,4,5,6]).every(function () {
+                    this.api().columns().every(function () {
                         var column = this;
                         var select = $('<select><option value="">All</option></select>')
                             .appendTo($(column.header()).empty())
@@ -91,7 +77,7 @@
                                 column.search(val ? '^' + val + '$' : '', true, false).draw();
                             });
 
-                        column.data().unique().sort().each(function (d, j) {
+                        column.data().unique().sort().each(function (d) {
                             if (d) {
                                 select.append('<option value="' + d + '">' + d + '</option>');
                             }

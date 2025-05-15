@@ -1,0 +1,45 @@
+﻿@model IEnumerable<DEPI_GraduationProject.ViewModels.StockRequestViewModel>
+
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>From Location</th>
+            <th>To Location</th>
+            <th>Product Code</th> <!-- Changed from Product Name -->
+            <th>Quantity</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.RequestId</td>
+                <td>@item.FromLocationName</td>
+                <td>@item.ToLocationName</td>
+                <td>@item.ProductCode</td> <!-- Changed from ProductName -->
+                <td>@item.Quantity</td>
+                <td>@item.RequestDate.ToShortDateString()</td>
+                <td>@item.Status</td>
+                <td>
+                    @if (item.Status == "Pending")
+                    {
+                        <form asp-action="Approve" asp-route-id="@item.RequestId" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form asp-action="Decline" asp-route-id="@item.RequestId" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No action</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
