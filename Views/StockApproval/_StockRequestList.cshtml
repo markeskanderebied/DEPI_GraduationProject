@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DEPI_GraduationProject.ViewModels.StockRequestViewModel>
+﻿@* @model IEnumerable<DEPI_GraduationProject.ViewModels.StockRequestViewModel>
 
 <table class="table table-bordered">
     <thead class="table-light">
@@ -42,4 +42,71 @@
             </tr>
         }
     </tbody>
-</table>
+</table> *@
+
+                        @model IEnumerable<DEPI_GraduationProject.ViewModels.StockRequestViewModel>
+
+<div id="request-list-container">
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Product Code</th>
+                        <th>Product Name</th>
+                        <th>From Location</th>
+                        <th>To Location</th>
+                        <th>Quantity</th>
+                        <th>Request Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="request-item" data-id="@item.RequestId">
+                            <td>@item.ProductCode</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.FromLocationName</td>
+                            <td>@item.ToLocationName</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.RequestDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                <span class="badge @(item.Status == "Approved" ? "bg-success" : item.Status == "Declined" ? "bg-danger" : "bg-warning")">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.Status == "Pending")
+                                {
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-success" onclick="approveRequest(@item.RequestId)">
+                                            Approve
+                                        </button>
+                                        <form asp-action="Decline" asp-controller="StockApproval" method="post" style="display: inline;">
+                                            <input type="hidden" name="id" value="@item.RequestId" />
+                                            <button type="submit" class="btn btn-sm btn-danger">Decline</button>
+                                        </form>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                        <tr id="error-@item.RequestId" style="display: none;">
+                            <td colspan="8">
+                                <div class="alert alert-danger error-message"></div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No pending stock requests found.
+        </div>
+    }
+</div>

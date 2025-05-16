@@ -30,7 +30,7 @@ namespace DEPI_GraduationProject.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 		[HttpGet("/GeneratePasswordHash")]
-		public IActionResult GeneratePasswordHash(string password = "manager123")
+		public IActionResult GeneratePasswordHash(string password = "manager2123")
 		{
 			var hasher = new PasswordHasher<object>();
 			var hashed = hasher.HashPassword(null, password);

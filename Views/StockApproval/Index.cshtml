@@ -11,10 +11,9 @@
 <div id="stockRequestList">
     <partial name="_StockRequestList" model="Model" />
 </div>
-
 @section Scripts {
     <script>
-        // Handle approve/decline form submissions
+        // Handle decline form submissions
         $('form').submit(function (event) {
             event.preventDefault();
             var form = $(this);
@@ -42,18 +41,59 @@
         // Handle clear button click
         $('#clearBtn').click(function () {
             $('#searchInput').val(''); // Clear the input field
+            refreshRequestList();
+        });
+
+        // Function to approve a request with inventory check
+        function approveRequest(requestId) {
+            // Hide any existing error messages
+            $("#error-" + requestId).hide();
+
+            $.ajax({
+                url: '@Url.Action("Approve", "StockApproval")',
+                type: 'POST',
+                data: { id: requestId },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        // Successfully approved - refresh the request list
+                        refreshRequestList();
+                    } else {
+                        // Show error message
+                        showErrorMessage(response.message, requestId);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        }
+
+        function showErrorMessage(message, requestId) {
+            // Show the error row and update its message
+            var errorRow = $("#error-" + requestId);
+            errorRow.find('.error-message').text(message);
+            errorRow.show();
+
+            // Automatically hide after 5 seconds
+            setTimeout(function() {
+                errorRow.hide();
+            }, 5000);
+        }
+
+        function refreshRequestList() {
             $.ajax({
                 url: '@Url.Action("Index", "StockApproval")',
                 type: 'GET',
-                success: function (data) {
-                    console.log('Clear response:', data); // Log the response
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function(data) {
                     $('#stockRequestList').html(data);
                 },
-                error: function (xhr, status, error) {
-                    console.log('AJAX error:', status, error); // Log any errors
-                    alert('Error resetting search. Please try again.');
+                error: function(xhr, status, error) {
+                    console.log('AJAX error:', status, error);
+                    alert('Error refreshing the request list. Please try again.');
                 }
             });
-        });
+        }
     </script>
 }

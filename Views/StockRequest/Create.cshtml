@@ -4,45 +4,162 @@
     ViewData["Title"] = "Create Stock Request";
 }
 
-<h2>Create Stock Request</h2>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<style>
+    .ui-autocomplete {
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 9999 !important;
+    }
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="FromLocationId" class="control-label">From Location</label>
-        <select asp-for="FromLocationId" class="form-control" asp-items="ViewBag.Locations">
-            <option value="">-- Select From Location --</option>
-        </select>
-        <span asp-validation-for="FromLocationId" class="text-danger"></span>
-    </div>
+    .ui-menu-item {
+        padding: 5px 10px;
+        cursor: pointer;
+    }
 
-    <div class="form-group">
-        <label asp-for="ToLocationId" class="control-label">To Location</label>
-        <select asp-for="ToLocationId" class="form-control" asp-items="ViewBag.Locations">
-            <option value="">-- Select To Location --</option>
-        </select>
-        <span asp-validation-for="ToLocationId" class="text-danger"></span>
-    </div>
+        .ui-menu-item:hover {
+            background-color: #f0f0f0;
+        }
 
-    <div class="form-group">
-        <label asp-for="ProductCode" class="control-label">Product</label>
-        <select asp-for="ProductCode" class="form-control" asp-items="ViewBag.ProductCodes">
-            <option value="">-- Select Product --</option>
-        </select>
-        <span asp-validation-for="ProductCode" class="text-danger"></span>
-    </div>
+    .ui-state-active, .ui-widget-content .ui-state-active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+</style>
 
-    <div class="form-group">
-        <label asp-for="Quantity" class="control-label">Quantity</label>
-        <input asp-for="Quantity" class="form-control" />
-        <span asp-validation-for="Quantity" class="text-danger"></span>
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ViewBag.SuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+}
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Create</button>
-        <a asp-action="Index" asp-controller="StockRequest" class="btn btn-secondary ml-2">Cancel</a>
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+@if (ViewData.ModelState.ContainsKey("FromLocationId"))
+{
+    <div class="alert alert-danger">
+        @Html.ValidationMessage("FromLocationId")
     </div>
-</form>
+}
+
+@if (ViewData.ModelState.ContainsKey("ProductCode"))
+{
+    <div class="alert alert-danger">
+        @Html.ValidationMessage("ProductCode")
+    </div>
+}
+
+@if (ViewData.ModelState.ContainsKey("Quantity"))
+{
+    <div class="alert alert-danger">
+        @Html.ValidationMessage("Quantity")
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Create Stock Request
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="stockRequestForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FromLocationId" class="form-label">From Location</label>
+                        <select asp-for="FromLocationId" class="form-control" asp-items="ViewBag.Locations">
+                            <option value="">-- Select From Location --</option>
+                        </select>
+                        <span asp-validation-for="FromLocationId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Quantity" class="form-label">Quantity</label>
+                        <input asp-for="Quantity" class="form-control" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="ProductCode" class="form-label">Product Code</label>
+                        <input id="productCodeInput" asp-for="ProductCode" class="form-control" autocomplete="off" placeholder="Start typing product code..." />
+                        <span asp-validation-for="ProductCode" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ProductName" class="form-label">Product Name</label>
+                        <input id="productNameDisplay" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <a asp-action="Index" asp-controller="StockRequest" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success ms-2">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Autocomplete for product code
+            $("#productCodeInput").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Products/SuggestProductCodes',
+                        data: { term: request.term },
+                        dataType: 'json',
+                        success: function (data) {
+                            // Limit to 10 results for better UX
+                            response(data.slice(0, 10));
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    $(this).val(ui.item.value);
+                    fetchProductName(ui.item.value);
+                    return false;
+                }
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                // Custom rendering for dropdown items
+                return $("<li>")
+                    .append("<div>" + item.value + "</div>")
+                    .appendTo(ul);
+            };
+
+            // Handle manual input without selection
+            $("#productCodeInput").on('change', function() {
+                var code = $(this).val();
+                fetchProductName(code);
+            });
+
+            // Function to fetch product name
+            function fetchProductName(code) {
+                if (!code) {
+                    $('#productNameDisplay').val('');
+                    return;
+                }
+
+                $.get('/Products/GetProductNameByCode', { code: code }, function (data) {
+                    if (data && data.productName) {
+                        $('#productNameDisplay').val(data.productName);
+                    } else {
+                        $('#productNameDisplay').val('Product not found');
+                    }
+                }).fail(function () {
+                    $('#productNameDisplay').val('Error loading product');
+                });
+            }
+        });
+    </script>
 }
