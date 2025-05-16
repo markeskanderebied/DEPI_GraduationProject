@@ -14,10 +14,11 @@
 <table id="salesTable" class="display nowrap" style="width:100%">
     <thead>
         <tr>
-            <th>Sale ID</th>
+            @* <th>Sale ID</th> *@
             <th>Date</th>
             <th>Client</th>
-            <th>Location</th>
+           <th>Client Number</th>
+            <th>Car Number</th>
             <th>Product</th>
             <th>Quantity</th>
         </tr>
@@ -25,7 +26,7 @@
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
-            <th><select><option value="">All</option></select></th>
+             <th><select><option value="">All</option></select></th> 
             <th><select><option value="">All</option></select></th>
             <th><select><option value="">All</option></select></th>
         </tr>
@@ -36,10 +37,11 @@
             foreach (var detail in sale.SaleDetails)
             {
                 <tr>
-                    <td>@sale.Id</td>
+                    @* <td>@sale.Id</td> *@
                     <td>@sale.sale_date.ToString("g")</td>
                     <td>@sale.Clients?.Name</td>
-                    <td>@sale.Location?.Name</td>
+                     <td>@sale.Clients?.Phone</td>
+                    <td>@sale.Clients?.car_number</td>
                     <td>@detail.Product?.name</td>
                     <td>@detail.Quantity</td>
                 </tr>
