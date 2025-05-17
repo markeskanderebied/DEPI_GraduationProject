@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-public class AdminDashboardController : Controller
+namespace DEPI_GraduationProject.Controllers
 {
-	public IActionResult Index()
-	{
-		ViewBag.Role = TempData["UserRole"] ?? "Unknown";
-		return View();
-	}
+    [Authorize(Roles = "Admin")]
+    public class AdminDashboardController : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+    }
 }

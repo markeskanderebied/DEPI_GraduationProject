@@ -1,0 +1,26 @@
+﻿@model DEPI_GraduationProject.DTOs.LoginWith2faModel
+
+<h2>Two-Factor Authentication</h2>
+<form asp-action="LoginWith2fa" method="post">
+    <input type="hidden" asp-for="RememberMe" />
+    <div class="form-group">
+        <label asp-for="TwoFactorCode">Enter your 2FA code</label>
+        <input asp-for="TwoFactorCode" class="form-control" />
+        <span asp-validation-for="TwoFactorCode" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RememberMachine">
+            <input asp-for="RememberMachine" />
+            Remember this device (skip 2FA on this device for 30 days)
+        </label>
+    </div>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="text-danger">
+            @ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">Verify</button>
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+</form>
+<p>Check your email or authenticator app for the code.</p>

@@ -14,24 +14,26 @@ public class myInventoryController : Controller
 
 	public async Task<IActionResult> Index()
 	{
-		var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+        var userName = User.Identity?.Name;
 
-		if (employeeId == null)
-		{
-			return RedirectToAction("Login", "Account"); // Or return Unauthorized()
-		}
+        if (string.IsNullOrEmpty(userName))
+        {
+            return RedirectToAction("Login", "Account");
+        }
 
-		var employee = await _context.Employees
-			.FirstOrDefaultAsync(e => e.Id == employeeId);
+        var user = await _context.AspNetUsers
+            .OfType<ApplicationUser>()
+            .FirstOrDefaultAsync(u => u.UserName == userName);
 
-		if (employee == null)
-		{
-			return NotFound("Employee not found.");
-		}
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
 
-		var location_id = employee.Location_id;
+        var location_id = user.Location_id;
 
-		var inventoryList = await _context.Inventory
+
+        var inventoryList = await _context.Inventory
 			.Include(i => i.Location)
 			.Include(i => i.Product)
 			 .ThenInclude(p => p.Category)

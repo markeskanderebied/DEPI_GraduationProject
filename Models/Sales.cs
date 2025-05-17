@@ -9,9 +9,9 @@
 		public DateTime sale_date { get; set; }
 		
 		// Navigation properties
-		public Clients Clients { get; set; }
-		public ICollection<SaleDetails> SaleDetails { get; set; }
+		public required Clients Clients { get; set; }
+		public required ICollection<SaleDetails> SaleDetails { get; set; }
 		
-		public Location Location { get; set; }
+		public required Location Location { get; set; }
 	}
 }

@@ -59,8 +59,37 @@ namespace DEPI_GraduationProject.Controllers
 				return View("PosSale", model);
 			}
 
-			Clients client = await _context.Clients // Use exact model name 'Clients'
-										.FirstOrDefaultAsync(c => c.Phone == model.ClientNumber);
+            Clients? client = await _context.Clients // Use exact model name 'Clients'
+                .FirstOrDefaultAsync(c => c.Phone == model.ClientNumber);
+
+            if (client == null)
+            {
+                // Client not found, create a new one using data from ViewModel
+                client = new Clients
+                {
+                    Name = model.ClientName,
+                    Phone = model.ClientNumber, // Store number in Phone field
+                    car_number = model.CarNumber
+                };
+                _context.Clients.Add(client);
+                try
+                {
+                    // Save now to get the Client ID before creating the Sale
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    // Log dbEx.InnerException
+                    ModelState.AddModelError("savingClient", "Failed to save new client information. " + dbEx.InnerException?.Message ?? dbEx.Message);
+                    return View("PosSale", model);
+                }
+                catch (Exception ex) // Catch other potential errors during client save
+                {
+                    // Log ex
+                    ModelState.AddModelError("", "An unexpected error occurred while saving client information. " + ex.Message);
+                    return View("PosSale", model);
+                }
+            }
 
 			if (client == null)
 			{
@@ -101,13 +130,15 @@ namespace DEPI_GraduationProject.Controllers
 				{
 					// 1. Create the main Sale record
 					var sale = new Sales // Use 'Sales' model name
-					{
-						location_id = locationId,
-						client_id = clientId,
-						sale_date = DateTime.UtcNow,
-						SaleDetails = new List<SaleDetails>(), // Initialize collections
-						
-					};
+                    {
+                        location_id = locationId,
+                        client_id = clientId,
+                        sale_date = DateTime.UtcNow,
+                        Clients = client, // Set the required 'Clients' property
+                        Location = await _context.Locations.FirstOrDefaultAsync(l => l.Id == locationId)
+							 ?? throw new Exception("Location not found."), // Set the required 'Location' property
+                        SaleDetails = new List<SaleDetails>(), // Initialize collections
+                    };
 					_context.Sales.Add(sale);
 					// Save now to get sale.Id
 					await _context.SaveChangesAsync();
